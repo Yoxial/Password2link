@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订阅管理</title>
+    <script>
+        // 复制链接到剪贴板
+        function copyToClipboard(link) {
+            var textarea = document.createElement("textarea");
+            textarea.value = link;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+
+            // 显示“复制成功”的提示
+            showCopySuccess();
+        }
+
+        // 显示复制成功的提示框
+        function showCopySuccess() {
+            const copySuccessBox = document.getElementById("copy-success");
+            copySuccessBox.style.display = "block";
+            setTimeout(() => {
+                copySuccessBox.style.display = "none";
+            }, 2000);  // 提示框显示 2 秒后消失
+        }
+
+        // 切换显示不同栏目
+        function switchCategory(category) {
+            const allCategories = document.querySelectorAll(".category");
+            allCategories.forEach(function(cat) {
+                if (cat.classList.contains(category)) {
+                    cat.style.display = "block";
+                } else {
+                    cat.style.display = "none";
+                }
+            });
+        }
+
+        // 显示添加订阅表单
+        function showAddSubscriptionForm() {
+            const addSubscriptionForm = document.getElementById("add-subscription-form");
+            addSubscriptionForm.style.display = "block";
+        }
+
+        // 隐藏添加订阅表单
+        function hideAddSubscriptionForm() {
+            const addSubscriptionForm = document.getElementById("add-subscription-form");
+            addSubscriptionForm.style.display = "none";
+        }
+    </script>
+    <style>
+        /* 重置样式，确保布局一致性 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;  /* 垂直排列 */
+            font-size: 20px;  /* 字体放大 */
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;  /* 填满整个宽度 */
+            height: 100%;  /* 填满整个高度 */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;  /* 不居中，靠左排列 */
+            overflow-y: auto;
+            max-width: 1200px;  /* 最大宽度，避免过宽 */
+            margin: 0 auto;  /* 水平居中 */
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 0;  /* 移除外边距 */
+        }
+
+        .add-subscription-button {
+            padding: 10px;
+            font-size: 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+
+        .add-subscription-button:hover {
+            background-color: #45a049;
+        }
+
+        .category-switch {
+            margin-bottom: 20px;
+            font-size: 24px;
+            width: 100%;
+        }
+
+        .category-switch button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 20px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+        }
+
+        .category-switch button:hover {
+            background-color: #ddd;
+        }
+
+        .category {
+            display: none;  /* 默认隐藏每个栏目 */
+            width: 100%;
+        }
+
+        .links-column {
+            display: flex;
+            flex-direction: column; /* 使用列布局 */
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-size: 22px;
+        }
+
+        td {
+            font-size: 20px;
+            word-wrap: break-word;
+        }
+
+        .copy-button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .copy-button:hover {
+            background-color: #45a049;
+        }
+
+        /* 复制成功提示框的样式 */
+        #copy-success {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        /* 添加订阅表单的样式 */
+        #add-subscription-form {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            z-index: 1001;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        #add-subscription-form input, #add-subscription-form button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 18px;
+            width: calc(100% - 20px);
+        }
+
+        .close-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .close-button:hover {
+            background-color: #d32f2f;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                width: 100%;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .add-subscription-button {
+                font-size: 20px;
+            }
+
+            .category-switch button {
+                font-size: 16px;
+                padding: 8px;
+            }
+
+            table th, table td {
+                font-size: 16px;
+            }
+
+            #add-subscription-form {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 复制成功的提示框 -->
+    <div id="copy-success">复制成功</div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>订阅管理</h1>
+            <button class="add-subscription-button" onclick="showAddSubscriptionForm()">+</button>
+        </div>
+
+        <div class="category-switch">
+            <!-- 按钮切换栏目 -->
+            {% for category in collections.keys() %}
+                <button onclick="switchCategory('{{ category }}')">{{ category }}</button>
+            {% endfor %}
+        </div>
+
+        <div class="links-column">
+            <!-- 链接显示区域 -->
+            {% for category, links in collections.items() %}
+                <div class="category {{ category }}">
+                    <h2>{{ category }} 链接</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>链接</th>
+                                <th>复制</th>
+                                <th>备注</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for link in links %}
+                                <tr>
+                                    <td>{{ link.link }}</td>
+                                    <td>
+                                        <button class="copy-button" onclick="copyToClipboard('{{ link.link }}')">复制链接</button>
+                                    </td>
+                                    <td>
+                                        <input type="text" value="{{ link.note }}" readonly />
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 添加订阅表单 -->
+    <div id="add-subscription-form">
+        <h2>添加订阅</h2>
+        <form action="/add_link" method="POST">
+            <label>分类：</label><br>
+            <input type="text" id="new-category" name="category" required><br>
+
+            <label>订阅：</label><br>
+            <input type="url" id="new-subscription" name="link" required 
+                   placeholder="例如：http://www.example.com"><br>
+
+            <label>备注：</label><br>
+            <input type="text" id="new-note" name="note"><br>
+
+            <button type="button" class="close-button" onclick="hideAddSubscriptionForm()">关闭</button>
+            <button type="submit">提交</button>
+        </form>
+    </div>
+</body>
+</html>
