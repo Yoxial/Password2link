@@ -34,4 +34,4 @@ The **Subscription Management System** is a web-based application designed to he
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/subscription-management.git
+   git clone https://github.com/Yoxial/Password2link.git
